@@ -29,11 +29,7 @@ demo_score <-
     metadata_champions <-
       metadata_models %>%
       filter(champion == 1) %>%
-      select(model_id) %>%
-      mutate(
-        path = str_c("data/model/h2o/", model_id),
-        h2o_model = map(path, h2o.loadModel)
-      )
+      select(h2o_model = model, model_id)
 
 
     # | Score ----
@@ -47,7 +43,7 @@ demo_score <-
       ) %>%
       set_names(metadata_champions$model_id) %>%
       bind_rows(.id = "model_id") %>%
-      select(rowid, p1, model_id)
+      select(col_id, p1, model_id)
 
 
 
@@ -58,7 +54,7 @@ demo_score <-
       group_by(model_id) %>%
       mutate(group = ntile(-p1, 20)) %>%
       group_by(model_id, group) %>%
-      summarise_at(vars(p1), funs(lower_threshold = "min",
+      summarise_at(vars(p1), list(lower_threshold = "min",
                                   response_rate = "mean",
                                   "sd",
                                   n = "length")) %>%
@@ -125,9 +121,10 @@ demo_score <-
 
 
 # data <- NULL
-# model <- NULL
+# model <- run_model$metadata_results
 # path_data <- "data/train/2018-09-26_holdout_data.rds"
-# path_model <- "data/model/2018-09-27_model.rds"
+# # path_model <- "data/model/2018-09-27_model.rds"
+# path_model <- NULL
 # col_id <- "rowid"
 #
 # test <-

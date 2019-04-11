@@ -60,11 +60,15 @@ demo_segment <- function(data, k = 20, estimate_k = TRUE, cols_include = NULL, c
 
 # Test --------------------------------------------------------------------
 
-# data <- mtcars %>% rownames_to_column()
+# data <- "data/bank.csv" %>% read_delim(delim = ";")
+#
 # k <- 20
 # estimate_k <- TRUE
-# cols_remove <- "mpg"
-# cols_include <- c("mpg", "cyl")
+# # cols_remove <- "mpg"
+# # cols_include <- c("mpg", "cyl")
+# cols_remove <- NULL
+# cols_include <- NULL
+#
 #
 # test_segment <-
 #   demo_segment(

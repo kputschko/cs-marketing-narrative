@@ -38,7 +38,7 @@ ui <-
                            label = "Select Raw Data",
                            multiple = TRUE,
                            selected = NULL,
-                           choices = dir("C:/Users/exp01754/OneDrive/Data/demo_sw/data", pattern = ".csv"),
+                           choices = dir("data", pattern = ".csv"),
                            options = list(maxItems = 1, placeholder = "NULL")),
             textInput(inputId = "import_data_delim",
                       label = "Data Delimiter",
@@ -134,7 +134,7 @@ server <- function(input, output) {
   # |- Import ----
   data_raw <- eventReactive(input$import_data_button, {
     input$import_data_path %>%
-      str_c("C:/Users/exp01754/OneDrive/Data/demo_sw/data/", .) %>%
+      str_c("data/", .) %>%
       read_delim(input$import_data_delim)
   })
 
@@ -269,6 +269,7 @@ server <- function(input, output) {
 
   # |- Model ----
 
+  # UI - List Segments to Include in Model
   output$model_segment_list <- renderUI(
     selectizeInput("model_segment_selection",
                    label = "Filter by Segment",
@@ -278,6 +279,7 @@ server <- function(input, output) {
                    options = list(placeholder = "All"))
   )
 
+  # UI - Input Max Runtime for Model
   output$model_automl_runtime <- renderUI(
     numericInput(inputId = "model_automl_runtime",
                  label = "Auto ML Max Runtime",
@@ -288,6 +290,7 @@ server <- function(input, output) {
                                 input$model_segment_selection %>% length() %>% magrittr::multiply_by(30)))
   )
 
+  # Push the Button - Build the Model
   model_automl <-
     eventReactive(input$model_button, {
 
@@ -301,8 +304,8 @@ server <- function(input, output) {
         pluck("data_initial") %>%
         filter(!!! model_filter) %>%
         mutate(y = ifelse(y == "yes", 1, 0)) %>%
-        demo_model(data = ., response = "y", algorithms = "auto")
-        # demo_model(data = ., response = "y", algorithms = "lr")
+        # demo_model(data = ., response = "y", algorithms = "auto")
+        demo_model(data = ., response = "y", algorithms = "lr")
 
     })
 
@@ -337,7 +340,8 @@ server <- function(input, output) {
         sellen = input$model_segment_selection %>% length(),
         selchk = input$model_segment_selection %>% is_empty(),
         runtime = input$model_automl_runtime,
-        data = data_sample_list()$data_initial %>% distinct(segment) %>% pull() %>% sort()
+        data = data_sample_list()$data_initial %>% distinct(segment) %>% pull() %>% sort(),
+        model = model_automl() %>% names()
         )
 
   })
